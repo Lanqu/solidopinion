@@ -37,7 +37,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.test.sum.MainProceduralWay</mainClass>
+                            <mainClass>com.test.sum.MainFunctionalWay</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

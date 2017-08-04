@@ -28,3 +28,13 @@ support 64-bit bits of precision.
 The program must be able to handle input files consisting of more than one billion
 integers. Please make an effort to make your sum program perform well for larger
 inputs.
+
+-------------------------------------------------------------------------------------------
+------[ SOLUTION
+-------------------------------------------------------------------------------------------
+
+It consists of 2 similar implementations. The first one I've found the most fun and the
+second one a bit faster.
+com.test.sum.MainFunctionalWay - usage of Streams, Iterator and Java nio. It took ~60 secs
+to process 19Gb binary file
+com.test.sum.MainProceduralWay - usage of Java nio. It took ~56 secs to process 19Gb binary file
