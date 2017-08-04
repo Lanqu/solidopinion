@@ -6,21 +6,18 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.channels.ReadableByteChannel;
 import java.util.Iterator;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.IntFunction;
-import java.util.function.ToIntFunction;
 
-public class MyIterator implements Iterator<Integer> {
-    private ByteBuffer allocated = ByteBuffer.allocate(1024 * 1024).order(ByteOrder.LITTLE_ENDIAN);
-    private final ChannelReader byteBufferConsumer;
+public class FileOfIntegersIterator implements Iterator<Integer> {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final ByteBuffer allocated =
+            ByteBuffer.allocate(1024 * 1024).order(ByteOrder.LITTLE_ENDIAN);
+    private final ChannelReader channelReader;
 
-    MyIterator(final ChannelReader byteBufferConsumer) throws IOException {
-        this.byteBufferConsumer = byteBufferConsumer;
+    FileOfIntegersIterator(final ChannelReader channelReader) throws IOException {
+        this.channelReader = channelReader;
 
-        byteBufferConsumer.read(allocated);
+        channelReader.read(allocated);
         allocated.flip();
     }
 
@@ -31,19 +28,21 @@ public class MyIterator implements Iterator<Integer> {
         } else {
             allocated.flip();
 
-            int read = 0;
+            int read;
             try {
-                read = byteBufferConsumer.read(allocated);
+                read = channelReader.read(allocated);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("That shouldn't happen during exercise", e);
+                throw new RuntimeException(e);
             }
 
-            if (read > 0) {
+            if (read >= 4) {
                 allocated.flip();
-                return allocated.hasRemaining();
+                return true;
+            } else {
+                return false;
             }
         }
-        return false;
     }
 
     @Override

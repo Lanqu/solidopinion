@@ -18,14 +18,18 @@ import static java.util.Spliterator.NONNULL;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class MainFunctionalWayTest {
+/**
+ * For file ~19 GB it took:
+ * Functional Java 8 way: ~60 sec
+ * Procedural old way: ~56 sec
+ */
+public class MainTest {
 
     private String filePath;
 
     @Before
     public void setUp() throws Exception {
-//        filePath = Paths.get(this.getClass().getResource("/simple.txt").toURI()).toFile().getAbsolutePath();
-        filePath = "d:\\Videos\\torrent\\123\\Prey [MULTi2]\\data1.dat";
+        filePath = Paths.get(this.getClass().getResource("/simple.txt").toURI()).toFile().getAbsolutePath();
     }
 
     @Test

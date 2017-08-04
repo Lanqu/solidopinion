@@ -6,28 +6,30 @@ import org.slf4j.LoggerFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.util.Iterator;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
-public class SecuredIteratorImpl implements SecuredIterator {
+public class SecuredResourceAccessorImpl implements ResourceAccessor {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private static final int BYTES_IN_INT = 4;
 
     @Override
-    public void withResources(final String fileName, final BiConsumer<Long, Iterator<Integer>> it) {
+    public void withResources(final String fileName, final CalculateAction it) {
         logger.debug("Resolving file %s", fileName);
 
-        try (final RandomAccessFile r = new RandomAccessFile(fileName, "r")) {
-            try (final FileChannel channel = r.getChannel()) {
-                final long integersInFile = r.length() / BYTES_IN_INT;
-                it.accept(integersInFile, new MyIterator(channel));
-            }
+        try (final RandomAccessFile r = new RandomAccessFile(fileName, "r");
+             final ReadableByteChannel channel = r.getChannel()) {
+            final long integersInFile = getCountOfIntegersInFile(r);
+            it.calculate(integersInFile, new FileOfIntegersIterator(channel::read));
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error accessing file", e);
         }
+    }
+
+    private long getCountOfIntegersInFile(RandomAccessFile r) throws IOException {
+        return r.length() / BYTES_IN_INT;
     }
 }
